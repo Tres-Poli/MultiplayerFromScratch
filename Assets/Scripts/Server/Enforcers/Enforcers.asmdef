@@ -1,0 +1,20 @@
+{
+    "name": "Enforcers",
+    "rootNamespace": "",
+    "references": [
+        "GUID:5c7fcabc4abc409c8b6413cdea911609",
+        "GUID:41bf2928f521447d9c4f143e3746b495",
+        "GUID:17f5ed81f46f4a0a8b69a6efc83b796b",
+        "GUID:b3766a7b8c5747fb8bdf9be83f6a0194",
+        "GUID:b0214a6008ed146ff8f122a6a9c2f6cc"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
