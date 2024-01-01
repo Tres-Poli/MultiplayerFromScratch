@@ -1,6 +1,7 @@
 ﻿using Character;
 using CharacterControllers;
 using Messages;
+using Networking;
 using UI;
 using ResourceManagement;
 using UI.Infrastructure;
@@ -22,6 +23,7 @@ namespace Core
             builder.Register<ICharacterFactory, CharacterFactory>(Lifetime.Singleton).As<IInitialize>();
             builder.Register<ISpawnManager, SpawnManager>(Lifetime.Singleton);
             builder.Register<IResourceManager, ResourceManager>(Lifetime.Singleton);
+            builder.Register<IReconciliation, Reconciliation>(Lifetime.Singleton);
             
             // UI
             builder.Register<IUiFactory, LoggerFactory>(Lifetime.Scoped);
@@ -29,6 +31,9 @@ namespace Core
             
             // Networking
             builder.Register<IMessageRouter, MessageRouter>(Lifetime.Singleton);
+            
+            // Debug
+            builder.Register<DebugDispatcher>(Lifetime.Singleton);
         }
     }
 }

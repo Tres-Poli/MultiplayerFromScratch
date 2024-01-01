@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Networking
+namespace Configs
 {
     [CreateAssetMenu(fileName = "ServerConfig", menuName = "Configs/ServerConfig")]
     public sealed class ServerConfig : ScriptableObject

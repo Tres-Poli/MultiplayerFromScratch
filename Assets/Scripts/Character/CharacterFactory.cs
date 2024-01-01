@@ -2,6 +2,7 @@
 using Leopotam.Ecs;
 using ResourceManagement;
 using Components;
+using Configs;
 using Core;
 using Cysharp.Threading.Tasks;
 using UnityEngine;

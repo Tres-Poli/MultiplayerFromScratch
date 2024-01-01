@@ -5,7 +5,8 @@ namespace Messages
 {
     public interface IMessageRouter
     {
-        void Send(ushort clientId, ushort messageType, Message message);
+        void SendToAll(Message serializable);
+        void Handle(ushort clientId, ushort messageType, Message message);
         void Subscribe(ushort messageType, IMessageHandler handler);
         void Unsubscribe(ushort messageType);
     }

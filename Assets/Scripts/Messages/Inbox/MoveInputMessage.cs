@@ -1,16 +1,17 @@
 ﻿using Riptide;
 using UnityEngine;
 
-namespace MessageStructs
+namespace Messages
 {
-    public struct PositionControlMessage : IMessageSerializable
+    public struct MoveInputMessage : IMessageSerializable
     {
-        public Vector3 Direction { get; private set; } 
+        public Vector3 Point;
+
         public void Serialize(Message message)
         {
-            message.AddFloat(Direction.x);
-            message.AddFloat(Direction.y);
-            message.AddFloat(Direction.z);
+            message.AddFloat(Point.x);
+            message.AddFloat(Point.y);
+            message.AddFloat(Point.z);
         }
 
         public void Deserialize(Message message)
@@ -20,7 +21,7 @@ namespace MessageStructs
             newDirection.y = message.GetFloat();
             newDirection.z = message.GetFloat();
 
-            Direction = newDirection;
+            Point = newDirection;
         }
     }
 }

@@ -1,48 +1,77 @@
 ﻿using Leopotam.Ecs;
 using Components;
 using Core;
+using Cysharp.Threading.Tasks;
 using Messages;
-using MessageStructs;
 using Networking;
 using Riptide;
 using UnityEngine;
 
-namespace Transformations
+namespace Systems
 {
     public class MoveSystem : IEcsRunSystem, IEcsDestroySystem, IMessageHandler
     {
         private readonly IMessageRouter _messageRouter;
-        private EcsWorld _world;
+        private readonly DebugDispatcher _dispatcher;
+        private readonly IReconciliation _reconciliation;
         private EcsFilter<IdComponent, MoveComponent, BodyComponent> _filter;
 
-        public MoveSystem(IMessageRouter messageRouter)
+        public MoveSystem(IMessageRouter messageRouter, DebugDispatcher dispatcher, IReconciliation reconciliation)
         {
             _messageRouter = messageRouter;
-            _messageRouter.Subscribe((ushort)MessageType.Position, this);
+            _dispatcher = dispatcher;
+            _reconciliation = reconciliation;
+            _messageRouter.Subscribe((ushort)MessageType.DirectionInput, this);
         }
 
         public void Run()
         {
             for (int i = 0; i < _filter.GetEntitiesCount(); i++)
             {
+                ref IdComponent idComponent = ref _filter.Get1(i);
                 ref MoveComponent moveComponent = ref _filter.Get2(i);
-                ref BodyComponent charComponent = ref _filter.Get3(i);
-                charComponent.Body.MovePosition(charComponent.Body.position + moveComponent.DirectionSpeedTaken * Time.deltaTime);
+                ref BodyComponent bodyComponent = ref _filter.Get3(i);
+                
+                moveComponent.Interpolation += TickController.TimeStep;
+                Vector3 newPosition = Vector3.Lerp(moveComponent.PrevPosition, moveComponent.TargetPosition,
+                    moveComponent.Interpolation / moveComponent.InterpolationFactor);
+                bodyComponent.Body.MovePosition(newPosition);
+                
+                PositionMessage positionMessage = new PositionMessage();
+                positionMessage.Id = idComponent.Id;
+                positionMessage.ReconciliationId = _reconciliation.GetReconId(idComponent.Id);
+                positionMessage.Position = bodyComponent.Body.position;
+
+                _dispatcher.Enqueue(() =>
+                {
+                    Message message = Message.Create(MessageSendMode.Unreliable, (ushort)MessageType.Position);
+                    message.AddSerializable(positionMessage);
+                    _messageRouter.SendToAll(message);
+                });
             }
         }
 
         public void HandleMessage(ushort id, Message message)
         {
-            PositionControlMessage positionMessage = new PositionControlMessage();
-            positionMessage.Deserialize(message);
+            MoveInputMessage moveInputMessage = new MoveInputMessage();
+            moveInputMessage.Deserialize(message);
 
             for (int i = 0; i < _filter.GetEntitiesCount(); i++)
             {
-                ref IdComponent component = ref _filter.Get1(i);
-                if (component.Id == id)
+                ref IdComponent idComponent = ref _filter.Get1(i);
+                if (idComponent.Id == id)
                 {
-                    ref MoveComponent moveComponent = ref _filter.Get2(i);
-                    moveComponent.DirectionSpeedTaken = positionMessage.Direction * moveComponent.Speed;
+                    _dispatcher.Enqueue(() =>
+                    {
+                        ref BodyComponent bodyComponent = ref _filter.Get3(i);
+                        ref MoveComponent moveComponent = ref _filter.Get2(i);
+                        moveComponent.PrevPosition = bodyComponent.Body.position;
+                        moveComponent.TargetPosition = moveInputMessage.Point;
+                        moveComponent.Interpolation = 0f;
+                        moveComponent.InterpolationFactor =
+                            (moveComponent.TargetPosition - moveComponent.PrevPosition).magnitude / moveComponent.Speed;
+                    });
+                    
                     break;
                 }
             }
@@ -50,7 +79,7 @@ namespace Transformations
 
         public void Destroy()
         {
-            _messageRouter.Unsubscribe((ushort)MessageType.Position);
+            _messageRouter.Unsubscribe((ushort)MessageType.DirectionInput);
         }
     }
 }

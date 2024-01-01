@@ -6,15 +6,24 @@ namespace Core
 {
     internal sealed class TickController : MonoBehaviour, ITickController
     {
+        public static float TimeStep = 0.25f;
+        
         private List<IUpdateController> _updateControllers;
-
+        private List<ITimestampController> _timestampControllers;
+        
         private Action<IUpdateController> _updateControllerFiniteCallback;
+        private Action<ITimestampController> _timestampControllerFiniteCallback;
+
+        private float _timeStep;
 
         private void Awake()
         {
             _updateControllers = new List<IUpdateController>(32);
-
+            _timestampControllers = new List<ITimestampController>(32);
             _updateControllerFiniteCallback = UpdateControllerFinite_Callback;
+            _timestampControllerFiniteCallback = TimestempControllerFinite_Callback;
+
+            _timeStep = TimeStep;
         }
 
         private void Update()
@@ -22,6 +31,17 @@ namespace Core
             for (int i = _updateControllers.Count - 1; i >= 0; i--)
             {
                 _updateControllers[i].UpdateController(Time.deltaTime);
+            }
+
+            _timeStep -= Time.deltaTime;
+            if (_timeStep <= 0f)
+            {
+                for (int i = 0; i < _timestampControllers.Count; i++)
+                {
+                    _timestampControllers[i].UpdateController();
+                }
+
+                _timeStep = TimeStep;
             }
         }
 
@@ -34,9 +54,23 @@ namespace Core
             return holder;
         }
 
+        public IFinite AddController(ITimestampController timestampController)
+        {
+            ControllerHolder<ITimestampController> holder = new ControllerHolder<ITimestampController>(timestampController);
+            holder.OnControllerFinite += _timestampControllerFiniteCallback;
+            _timestampControllers.Add(timestampController);
+
+            return holder;
+        }
+
         private void UpdateControllerFinite_Callback(IUpdateController controller)
         {
             _updateControllers.Remove(controller);
+        }
+
+        private void TimestempControllerFinite_Callback(ITimestampController controller)
+        {
+            _timestampControllers.Remove(controller);
         }
     }
 }

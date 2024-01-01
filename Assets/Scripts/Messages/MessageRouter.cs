@@ -1,11 +1,16 @@
 ﻿using System.Collections.Generic;
 using Core;
+using Cysharp.Threading.Tasks;
 using Riptide;
+using Systems;
+using UnityEngine;
 
 namespace Messages
 {
     public sealed class MessageRouter : IMessageRouter
     {
+        private const int DebugMessageDelayMs = 70;
+        
         private readonly ILoggerService _logger;
         private Dictionary<ushort, IMessageHandler> _subscribers;
         
@@ -15,12 +20,20 @@ namespace Messages
             _subscribers = new Dictionary<ushort, IMessageHandler>();
         }
 
-        public void Send(ushort clientId, ushort messageType, Message message)
+        public void SendToAll(Message message)
+        {
+            NetworkSystem.Server.SendToAll(message);
+            message.Release();
+        }
+
+        public void Handle(ushort clientId, ushort messageType, Message message)
         {
             if (_subscribers.TryGetValue(messageType, out IMessageHandler handler))
             {
                 handler.HandleMessage(clientId, message);
             }
+            
+            message.Release();
         }
 
         public void Subscribe(ushort messageType, IMessageHandler handler)

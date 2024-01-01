@@ -1,6 +1,6 @@
 ﻿using Riptide;
 
-namespace Core
+namespace Messages
 {
     public interface IMessageHandler
     {

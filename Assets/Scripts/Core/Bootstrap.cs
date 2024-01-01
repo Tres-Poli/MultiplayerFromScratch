@@ -6,14 +6,14 @@ using Messages;
 using Networking;
 using ResourceManagement;
 using Riptide.Utils;
-using Transformations;
+using Systems;
 using UI.Infrastructure;
 using UnityEngine;
 using VContainer;
 
 namespace Core
 {
-    public class Bootstrap : MonoBehaviour, IUpdateController
+    public class Bootstrap : MonoBehaviour, ITimestampController
     {
         [SerializeField] private RectTransform _mainCanvas;
         
@@ -37,12 +37,13 @@ namespace Core
 
         [Inject]
         public async UniTaskVoid Initialize(IReadOnlyList<IInitialize> initializeInstances, IUiManager uiManager, ILoggerService logger, 
-            IResourceManager resourceManager, ICharacterFactory characterFactory, ITickController tickController, IMessageRouter messageRouter)
+            IResourceManager resourceManager, ICharacterFactory characterFactory, ITickController tickController, IMessageRouter messageRouter,
+            DebugDispatcher dispatcher, IReconciliation reconciliation)
         {
             World = new EcsWorld ();
             _systems = new EcsSystems(World)
-                .Add(new MoveSystem(messageRouter))
-                .Add(new NetworkSystem(logger, resourceManager, characterFactory, messageRouter));
+                .Add(new MoveSystem(messageRouter, dispatcher, reconciliation))
+                .Add(new NetworkSystem(logger, resourceManager, characterFactory, messageRouter, dispatcher));
             
             _systems.Init();
             
@@ -57,7 +58,7 @@ namespace Core
             _updateSubscription = tickController.AddController(this);
         }
 
-        public void UpdateController(float deltaTime)
+        public void UpdateController()
         {
             _systems.Run();
         }

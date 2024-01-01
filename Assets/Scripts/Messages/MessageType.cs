@@ -4,6 +4,8 @@
     {
         Test = 0,
         
-        Position = 1,
+        DirectionInput = 1,
+        Position = 2,
+        ReconciliationSync = 2,
     }
 }
