@@ -9,7 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9347fa3fdc454413b80a167ed3ab3bca, type: 3}
-  m_Name: CharacterConfig
+  m_Script: {fileID: 11500000, guid: cf3cf59ff40e498a9ec48eff0a47d8ff, type: 3}
+  m_Name: SimpleAIConfig
   m_EditorClassIdentifier: 
-  <Speed>k__BackingField: 4
+  <Positions>k__BackingField:
+  - {x: 5, y: 0, z: 5}
+  - {x: -5, y: 0, z: 5}
+  - {x: -5, y: 0, z: -5}
+  - {x: 5, y: 0, z: -5}

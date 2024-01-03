@@ -43,7 +43,8 @@ namespace Core
             World = new EcsWorld ();
             _systems = new EcsSystems(World)
                 .Add(new MoveSystem(messageRouter, dispatcher, reconciliation))
-                .Add(new NetworkSystem(logger, resourceManager, characterFactory, messageRouter, dispatcher));
+                .Add(new NetworkSystem(logger, resourceManager, characterFactory, messageRouter, dispatcher))
+                .Add(new AISystem(resourceManager, characterFactory));
             
             _systems.Init();
             

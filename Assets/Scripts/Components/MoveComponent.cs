@@ -9,5 +9,10 @@ namespace Components
         public float InterpolationFactor;
         public float Interpolation;
         public float Speed;
+
+        public void CalculateInterpolationFactor()
+        {
+            InterpolationFactor = (TargetPosition - PrevPosition).magnitude / Speed;
+        }
     }
 }

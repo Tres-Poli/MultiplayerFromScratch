@@ -23,7 +23,7 @@ namespace Core
         {
             _dispatchQueue.Add(new DispatchUnit()
             {
-                Time = 0.05f,
+                Time = 0.1f,
                 Action = action
             });
         }

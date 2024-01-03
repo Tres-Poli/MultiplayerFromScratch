@@ -5,9 +5,9 @@ namespace Character
 {
     public class SpawnManager : ISpawnManager
     {
-        public void SpawnCharacter(CharacterView view)
+        public void SpawnCharacter(CharacterView view, Vector3 position)
         {
-            view.transform.position = new Vector3(0f, 1f, 0f);
+            view.transform.position = position;
         }
     }
 }

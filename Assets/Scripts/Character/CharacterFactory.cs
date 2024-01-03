@@ -53,7 +53,46 @@ namespace Character
             entity.Replace(bodyComponent);
             entity.Replace(idComponent);
 
-            _spawnManager.SpawnCharacter(charInstance);
+            _spawnManager.SpawnCharacter(charInstance, new Vector3(0f, 1f, 0f));
+        }
+        
+        public async UniTaskVoid CreateAICharacter(ushort id, Vector3[] points)
+        {
+            CharacterView charView = await _resourceManager.LoadPrefab<CharacterView>(PlayerPrefabKey);
+            CharacterView charInstance = Object.Instantiate(charView);
+            EcsEntity entity = Bootstrap.World.NewEntity();
+            MoveComponent moveComponent = new MoveComponent()
+            {
+                Speed = _config.Speed,
+                PrevPosition = points[0],
+                TargetPosition = points[0]
+            };
+            
+            moveComponent.CalculateInterpolationFactor();
+            moveComponent.Interpolation = 0f;
+
+            BodyComponent bodyComponent = new BodyComponent()
+            {
+                Body = charInstance.Body
+            };
+
+            IdComponent idComponent = new IdComponent()
+            {
+                Id = id
+            };
+
+            AIComponent aiComponent = new AIComponent()
+            {
+                TargetPointId = 0,
+                Points = points
+            };
+            
+            entity.Replace(moveComponent);
+            entity.Replace(bodyComponent);
+            entity.Replace(idComponent);
+            entity.Replace(aiComponent);
+
+            _spawnManager.SpawnCharacter(charInstance, points[0] + new Vector3(0f, 1f, 0f));
         }
     }
 }

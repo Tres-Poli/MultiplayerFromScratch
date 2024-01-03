@@ -68,8 +68,7 @@ namespace Systems
                         moveComponent.PrevPosition = bodyComponent.Body.position;
                         moveComponent.TargetPosition = moveInputMessage.Point;
                         moveComponent.Interpolation = 0f;
-                        moveComponent.InterpolationFactor =
-                            (moveComponent.TargetPosition - moveComponent.PrevPosition).magnitude / moveComponent.Speed;
+                        moveComponent.CalculateInterpolationFactor();
                     });
                     
                     break;

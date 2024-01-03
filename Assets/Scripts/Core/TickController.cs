@@ -6,7 +6,7 @@ namespace Core
 {
     internal sealed class TickController : MonoBehaviour, ITickController
     {
-        public static float TimeStep = 0.25f;
+        public static float TimeStep = 0.05f;
         
         private List<IUpdateController> _updateControllers;
         private List<ITimestampController> _timestampControllers;
