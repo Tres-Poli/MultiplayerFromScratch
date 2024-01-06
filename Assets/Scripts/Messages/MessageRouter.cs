@@ -26,6 +26,11 @@ namespace Messages
             message.Release();
         }
 
+        public void Send(ushort clientId, Message message)
+        {
+            NetworkSystem.Server.Send(message, clientId);
+        }
+
         public void Handle(ushort clientId, ushort messageType, Message message)
         {
             if (_subscribers.TryGetValue(messageType, out IMessageHandler handler))

@@ -1,7 +1,7 @@
 ﻿using Character;
 using UnityEngine;
 
-namespace CharacterControllers
+namespace Character
 {
     public interface ISpawnManager
     {

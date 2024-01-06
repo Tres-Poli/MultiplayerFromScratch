@@ -1,11 +1,10 @@
-﻿using Cysharp.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace CharacterControllers
+namespace Character
 {
     public interface ICharacterFactory
     {
-        UniTaskVoid CreateCharacter(ushort id);
-        UniTaskVoid CreateAICharacter(ushort id, Vector3[] points);
+        CharacterView CreateCharacter(ushort id);
+        void CreateAICharacter(ushort id, Vector3[] points);
     }
 }

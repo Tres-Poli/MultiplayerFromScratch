@@ -6,6 +6,8 @@
         
         DirectionInput = 1,
         Position = 2,
-        ReconciliationSync = 2,
+        ReconciliationSync = 3,
+        CharactersSync = 4,
+        RemoveClient = 5,
     }
 }

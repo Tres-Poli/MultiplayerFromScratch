@@ -1,7 +1,6 @@
-﻿using CharacterControllers;
+﻿using Character;
 using Configs;
 using Core;
-using Cysharp.Threading.Tasks;
 using Leopotam.Ecs;
 using Messages;
 using Networking;
@@ -17,21 +16,19 @@ namespace Systems
         
         private readonly ILoggerService _logger;
         private readonly IResourceManager _resourceManager;
-        private readonly ICharacterFactory _characterFactory;
         private readonly IMessageRouter _messageRouter;
-        private readonly DebugDispatcher _dispatcher;
+        private readonly IConnectionSyncManager _connectionSyncManager;
 
         private IFinite _subscribeHolder;
         private Server _server;
         
-        public NetworkSystem(ILoggerService logger, IResourceManager resourceManager, ICharacterFactory characterFactory, 
-            IMessageRouter messageRouter, DebugDispatcher dispatcher)
+        public NetworkSystem(ILoggerService logger, IResourceManager resourceManager, IMessageRouter messageRouter, 
+            IConnectionSyncManager connectionSyncManager)
         {
             _logger = logger;
             _resourceManager = resourceManager;
-            _characterFactory = characterFactory;
             _messageRouter = messageRouter;
-            _dispatcher = dispatcher;
+            _connectionSyncManager = connectionSyncManager;
         }
 
         public async void Init()
@@ -70,7 +67,8 @@ namespace Systems
         private void ClientConnected_Callback(object sender, ServerConnectedEventArgs e)
         {
             _logger.Log($"Client connected {e.Client.Id}");
-            _characterFactory.CreateCharacter(e.Client.Id);
+            //_characterProvider.CreateCharacter(e.Client.Id);
+            _connectionSyncManager.ConnectClient(e.Client.Id);
         }
 
         private void ClientFailed_Callback(object sender, ServerConnectionFailedEventArgs e)
@@ -81,6 +79,7 @@ namespace Systems
         private void ClientDisconnected_Callback(object sender, ServerDisconnectedEventArgs e)
         {
             _logger.Log($"Client disconnected {e.Client.Id}");
+            _connectionSyncManager.DisconnectClient(e.Client.Id);
         }
 
         public void Destroy()

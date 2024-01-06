@@ -1,4 +1,4 @@
-﻿using CharacterControllers;
+﻿using Character;
 using Components;
 using Configs;
 using Leopotam.Ecs;
@@ -12,21 +12,21 @@ namespace Systems
         private const string AIConfigKey = "SimpleAIConfig";
         
         private readonly IResourceManager _resourceManager;
-        private readonly ICharacterFactory _characterFactory;
+        private readonly ICharacterProvider _characterProvider;
 
         private EcsFilter<AIComponent, MoveComponent, BodyComponent> _filter;
         private SimpleAIConfig _config;
         
-        public AISystem(IResourceManager resourceManager, ICharacterFactory characterFactory)
+        public AISystem(IResourceManager resourceManager, ICharacterProvider characterProvider)
         {
             _resourceManager = resourceManager;
-            _characterFactory = characterFactory;
+            _characterProvider = characterProvider;
         }
 
         public async void Init()
         {
             _config = await _resourceManager.LoadConfig<SimpleAIConfig>(AIConfigKey);
-            _characterFactory.CreateAICharacter(16000, _config.Positions);
+            _characterProvider.CreateAICharacter(16000, _config.Positions);
         }
 
         public void Run()

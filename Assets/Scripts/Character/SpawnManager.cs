@@ -1,5 +1,4 @@
-﻿using CharacterControllers;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Character
 {

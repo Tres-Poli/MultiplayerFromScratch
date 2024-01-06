@@ -1,5 +1,4 @@
-﻿using CharacterControllers;
-using Leopotam.Ecs;
+﻿using Leopotam.Ecs;
 using ResourceManagement;
 using Components;
 using Configs;
@@ -18,6 +17,8 @@ namespace Character
         private readonly ISpawnManager _spawnManager;
         private CharacterConfig _config;
 
+        private CharacterView _characterPrefab;
+
         public CharacterFactory(IResourceManager resourceManager, ISpawnManager spawnManager)
         {
             _resourceManager = resourceManager;
@@ -27,12 +28,12 @@ namespace Character
         public async UniTask Initialize()
         {
             _config = await _resourceManager.LoadConfig<CharacterConfig>(PlayerConfigKey);
+            _characterPrefab = await _resourceManager.LoadPrefab<CharacterView>(PlayerPrefabKey);
         }
         
-        public async UniTaskVoid CreateCharacter(ushort id)
+        public CharacterView CreateCharacter(ushort id)
         {
-            CharacterView charView = await _resourceManager.LoadPrefab<CharacterView>(PlayerPrefabKey);
-            CharacterView charInstance = Object.Instantiate(charView);
+            CharacterView charInstance = Object.Instantiate(_characterPrefab);
             EcsEntity entity = Bootstrap.World.NewEntity();
             MoveComponent moveComponent = new MoveComponent()
             {
@@ -54,12 +55,12 @@ namespace Character
             entity.Replace(idComponent);
 
             _spawnManager.SpawnCharacter(charInstance, new Vector3(0f, 1f, 0f));
+            return charInstance;
         }
         
-        public async UniTaskVoid CreateAICharacter(ushort id, Vector3[] points)
+        public void CreateAICharacter(ushort id, Vector3[] points)
         {
-            CharacterView charView = await _resourceManager.LoadPrefab<CharacterView>(PlayerPrefabKey);
-            CharacterView charInstance = Object.Instantiate(charView);
+            CharacterView charInstance = Object.Instantiate(_characterPrefab);
             EcsEntity entity = Bootstrap.World.NewEntity();
             MoveComponent moveComponent = new MoveComponent()
             {

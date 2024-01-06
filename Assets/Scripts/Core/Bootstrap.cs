@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using CharacterControllers;
+using Character;
 using Cysharp.Threading.Tasks;
 using Leopotam.Ecs;
 using Messages;
@@ -37,17 +37,16 @@ namespace Core
 
         [Inject]
         public async UniTaskVoid Initialize(IReadOnlyList<IInitialize> initializeInstances, IUiManager uiManager, ILoggerService logger, 
-            IResourceManager resourceManager, ICharacterFactory characterFactory, ITickController tickController, IMessageRouter messageRouter,
-            DebugDispatcher dispatcher, IReconciliation reconciliation)
+            IResourceManager resourceManager, ICharacterProvider characterProvider, ITickController tickController, IMessageRouter messageRouter,
+            DebugDispatcher dispatcher, IReconciliation reconciliation, IConnectionSyncManager connectionSyncManager)
         {
             World = new EcsWorld ();
             _systems = new EcsSystems(World)
                 .Add(new MoveSystem(messageRouter, dispatcher, reconciliation))
-                .Add(new NetworkSystem(logger, resourceManager, characterFactory, messageRouter, dispatcher))
-                .Add(new AISystem(resourceManager, characterFactory));
-            
-            _systems.Init();
-            
+                .Add(new NetworkSystem(logger, resourceManager, messageRouter, connectionSyncManager))
+                .Add(new AISystem(resourceManager, characterProvider))
+                .Add(new CharacterSyncSystem(connectionSyncManager, messageRouter));
+
             await uiManager.Initialize(_mainCanvas);
             uiManager.AddScreen<ILoggerController>(ScreenType.Logger);
 
@@ -56,6 +55,7 @@ namespace Core
                 await initializeInstances[i].Initialize();
             }
 
+            _systems.Init();
             _updateSubscription = tickController.AddController(this);
         }
 
